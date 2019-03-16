@@ -9,11 +9,13 @@ class Square extends React.Component {
             value: null,
         };
     }
-
+    /**By calling this.setState from an onClick handler in the Square’s render method, we tell React to re-render that Square whenever its <button> is clicked.
+     * When you call setState in a component, React automatically updates the child components inside of it to*/
     render() {
         return (
-            <button className="square" onClick={() => alert("Click")}>
-                {this.props.value}
+            <button className="square"
+                    onClick={() => this.setState({value: 'X'})}>
+                {this.state.value}
             </button>
         );
     }
