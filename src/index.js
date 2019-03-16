@@ -1,8 +1,9 @@
-//The Square component renders a single <button>
+/**The Square component renders a single <button>*/
 class Square extends React.Component {
-    // To “remember” things, components use state.
-    // React components can have state by setting this.state in their constructors.
+    /** To “remember” things, components use state.*/
+    /** React components can have state by setting this.state in their constructors.*/
     constructor(props) {
+        /**Note In JavaScript classes, you need to always call super when defining the constructor of a subclass. All React component classes that have a constructor should start it with a super(props) call.*/
         super(props);
         this.state = {
             value: null,
@@ -18,9 +19,9 @@ class Square extends React.Component {
     }
 }
 
-// the Board renders 9 squares
+/** the Board renders 9 squares*/
 class Board extends React.Component {
-    //  In Board’s renderSquare method, change the code to pass a prop called value to the Square:
+    /**  In Board’s renderSquare method, change the code to pass a prop called value to the Square:*/
     renderSquare(i) {
         return <Square value={i}/>;
     }
