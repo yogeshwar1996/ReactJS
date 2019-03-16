@@ -86,7 +86,8 @@ class Board extends React.Component {
     }
 
     render() {
-        const status = 'Next player: X';
+        const status = 'Next player: '  + (this.state.xIsNext ? 'X' : 'O');
+
         /**In the beginning, we passed the value prop down from the Board to show numbers from 0 to 8 in every Square.
          *  In a different previous step, we replaced the numbers with an “X” mark determined by Square’s own state.
          *  This is why Square currently ignores the value prop passed to it by the Board.*/
