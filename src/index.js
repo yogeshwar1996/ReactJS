@@ -12,11 +12,29 @@ class Square extends React.Component {
 
     /**By calling this.setState from an onClick handler in the Square’s render method, we tell React to re-render that Square whenever its <button> is clicked.
      * When you call setState in a component, React automatically updates the child components inside of it to*/
+    /**Next, we need to change what happens when a Square is clicked.
+     *  The Board component now maintains which squares are filled.
+     *  We need to create a way for the Square to update the Board’s state.
+     *  Since state is considered to be private to a component that defines it,
+     *  we cannot update the Board’s state directly from Square.
+     *  Instead, we’ll pass down a function from the Board to the Square,
+     *  and we’ll have Square call that function when a square is clicked*/
+    /**When a Square is clicked, the onClick function provided by the Board is called.
+     *  Here’s a review of how this is achieved:
+     *  The onClick prop on the built-in DOM <button> component tells React to set up a click event listener.
+     *  When the button is clicked, React will call the onClick event handler that is defined in Square’s render()
+     *  method.This event handler calls this.props.onClick().
+     *  The Square’s onClick prop was specified by the Board.
+     *  Since the Board passed onClick={() => this.handleClick(i)} to Square,
+     *  the Square calls this.handleClick(i) when clicked.
+     *  We have not defined the handleClick() method yet, so our code crashes.
+     *  If you click a square now, you should see a red error screen saying something like
+     *  “this.handleClick is not a function”.*/
     render() {
         return (
             <button className="square"
-                    onClick={() => this.setState({value: 'X'})}>
-                {this.state.value}
+                    onClick={() => this.props.onClick()}>
+                {this.props.value}
             </button>
         );
     }
@@ -47,7 +65,14 @@ class Board extends React.Component {
         /** We will modify the Board to instruct each individual Square about its current value ('X', 'O', or null).
          *  We have already defined the squares array in the Board’s constructor, and we will modify the Board’s
          *  renderSquare method to read from it:*/
-        return <Square value={this.state.squares[i]} />;
+        return (
+            /**Now we’re passing down two props from Board to Square: value and onClick.
+             *  The onClick prop is a function that Square can call when clicked*/
+            <Square
+                value={this.state.squares[i]}
+                onClick={() => this.handleClick(i)}
+            />
+        )
     }
 
     render() {
