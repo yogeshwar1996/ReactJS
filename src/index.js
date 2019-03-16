@@ -12,6 +12,7 @@ class Square extends React.Component {
 
     /**By calling this.setState from an onClick handler in the Square’s render method, we tell React to re-render that Square whenever its <button> is clicked.
      * When you call setState in a component, React automatically updates the child components inside of it to*/
+
     /**Next, we need to change what happens when a Square is clicked.
      *  The Board component now maintains which squares are filled.
      *  We need to create a way for the Square to update the Board’s state.
@@ -53,12 +54,18 @@ class Board extends React.Component {
         super(props);
         this.state = {
             squares: Array(9).fill(null),
-        /** Initialize board's state as:
-         * [
-         *  null, null, null,
-         *  null, null, null,
-         *  null, null, null*/
+            /** Initialize board's state as:
+             * [
+             *  null, null, null,
+             *  null, null, null,
+             *  null, null, null*/
         };
+    }
+
+    handleClick(i) {
+        const squares = this.state.squares.slice();
+        squares[i] = 'X';
+        this.setState({squares: squares});
     }
 
     renderSquare(i) {
