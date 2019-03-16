@@ -1,14 +1,15 @@
 /**The Square component renders a single <button>*/
-class Square extends React.Component {
+/**Convert Square to function component*/
+function Square(props) {
+    return (
+        <button className="square"
+                onClick={() => props.onClick()}>
+            {props.value}
+        </button>
+    );
+
     /** To “remember” things, components use state.*/
     /** React components can have state by setting this.state in their constructors.*/
-    constructor(props) {
-        /**Note In JavaScript classes, you need to always call super when defining the constructor of a subclass. All React component classes that have a constructor should start it with a super(props) call.*/
-        super(props);
-        this.state = {
-            value: null,
-        };
-    }
 
     /**By calling this.setState from an onClick handler in the Square’s render method, we tell React to re-render that Square whenever its <button> is clicked.
      * When you call setState in a component, React automatically updates the child components inside of it to*/
@@ -31,14 +32,7 @@ class Square extends React.Component {
      *  We have not defined the handleClick() method yet, so our code crashes.
      *  If you click a square now, you should see a red error screen saying something like
      *  “this.handleClick is not a function”.*/
-    render() {
-        return (
-            <button className="square"
-                    onClick={() => this.props.onClick()}>
-                {this.props.value}
-            </button>
-        );
-    }
+
 }
 
 /** the Board renders 9 squares*/
@@ -54,6 +48,7 @@ class Board extends React.Component {
         super(props);
         this.state = {
             squares: Array(9).fill(null),
+            xIsNext: true
             /**Note how in handleClick, we call .slice() to create a copy of the squares array to modify instead of
              * modifying the existing array. There are generally two approaches to changing data.
              * The first approach is to mutate the data by directly changing the data’s values.
@@ -63,13 +58,17 @@ class Board extends React.Component {
              *  null, null, null,
              *  null, null, null,
              *  null, null, null*/
+            /**set the first move to be X's*/
         };
     }
-
+    /**Set square's value to be X if isNextX and revers the state after that*/
     handleClick(i) {
         const squares = this.state.squares.slice();
-        squares[i] = 'X';
-        this.setState({squares: squares});
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        this.setState({
+            squares: squares,
+            xIsNext: !this.state.xIsNext,
+        });
     }
 
     renderSquare(i) {
