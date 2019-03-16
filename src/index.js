@@ -1,8 +1,17 @@
 //The Square component renders a single <button>
 class Square extends React.Component {
+    // To “remember” things, components use state.
+    // React components can have state by setting this.state in their constructors.
+    constructor(props) {
+        super(props);
+        this.state = {
+            value: null,
+        };
+    }
+
     render() {
         return (
-            <button className="square" onClick={function() { alert('click'); }}>
+            <button className="square" onClick={() => alert("Click")}>
                 {this.props.value}
             </button>
         );
@@ -13,7 +22,7 @@ class Square extends React.Component {
 class Board extends React.Component {
     //  In Board’s renderSquare method, change the code to pass a prop called value to the Square:
     renderSquare(i) {
-        return <Square value={i} />;
+        return <Square value={i}/>;
     }
 
     render() {
