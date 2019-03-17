@@ -10,12 +10,27 @@
 </head>
 <body>
     <div id="root"></div>
+    <div id="toor"></div>
+
 
     <script type="text/babel">
         ReactDOM.render(
-              <div>Hello World</div>,
-              document.getElementById("root")
-          )
+            <div>Hello World</div>,
+            document.getElementById("root")
+        );
+
+        var num = 0;
+
+        function updateNum() {
+
+            ReactDOM.render(
+                <div>{num++}</div>,
+                document.getElementById("toor")
+            )
+        }
+
+        setInterval(updateNum, 2000)
+
     </script>
 
 </body>
