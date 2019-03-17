@@ -44,38 +44,41 @@ class Board extends React.Component {
      * with each other, you need to declare the shared state in their parent component instead.
      * The parent component can pass the state back down to the children by using props;
      * this keeps the child components in sync with each other and with the parent component.*/
-    constructor(props) {
-        super(props);
-        this.state = {
-            squares: Array(9).fill(null),
-            xIsNext: true
-            /**Note how in handleClick, we call .slice() to create a copy of the squares array to modify instead of
-             * modifying the existing array. There are generally two approaches to changing data.
-             * The first approach is to mutate the data by directly changing the data’s values.
-             * The second approach is to replace the data with a new copy which has the desired changes.*/
-            /** Initialize board's state as:
-             * [
-             *  null, null, null,
-             *  null, null, null,
-             *  null, null, null*/
-            /**set the first move to be X's*/
-        };
-    }
+    // constructor(props) {
+    //     super(props);
+    //     this.state = {
+    //         squares: Array(9).fill(null),
+    //         xIsNext: true
+    //         /**Note how in handleClick, we call .slice() to create a copy of the squares array to modify instead of
+    //          * modifying the existing array. There are generally two approaches to changing data.
+    //          * The first approach is to mutate the data by directly changing the data’s values.
+    //          * The second approach is to replace the data with a new copy which has the desired changes.*/
+    //         /** Initialize board's state as:
+    //          * [
+    //          *  null, null, null,
+    //          *  null, null, null,
+    //          *  null, null, null*/
+    //         /**set the first move to be X's*/
+    //     };
+    // }
 
     /**Set square's value to be X if isNextX and revers the state after that*/
-    handleClick(i) {
-        const squares = this.state.squares.slice();
-        /**We can now change the Board’s handleClick function to return early by ignoring a
-         * click if someone has won the game or if a Square is already filled:*/
-        if (calculateWinner(squares) || squares[i]) {
-            return;
-        }
-        squares[i] = this.state.xIsNext ? 'X' : 'O';
-        this.setState({
-            squares: squares,
-            xIsNext: !this.state.xIsNext,
-        });
-    }
+    // handleClick(i) {
+    //     /**if we mutated the squares array, implementing time travel would be very difficult.
+    //      however, we used slice() to create a new copy of the squares array after every move, and treated it as immutable.*/
+    //     const squares = this.state.squares.slice();
+    //     /**We can now change the Board’s handleClick function to return early by ignoring a
+    //      * click if someone has won the game or if a Square is already filled:This will allow us to store every past
+    //      * version of the squares array, and navigate between the turns that have already happened.*/
+    //     if (calculateWinner(squares) || squares[i]) {
+    //         return;
+    //     }
+    //     squares[i] = this.state.xIsNext ? 'X' : 'O';
+    //     this.setState({
+    //         squares: squares,
+    //         xIsNext: !this.state.xIsNext,
+    //     });
+    // }
 
     renderSquare(i) {
         /** We will modify the Board to instruct each individual Square about its current value ('X', 'O', or null).
@@ -84,28 +87,34 @@ class Board extends React.Component {
         return (
             /**Now we’re passing down two props from Board to Square: value and onClick.
              *  The onClick prop is a function that Square can call when clicked*/
-            <Square
-                value={this.state.squares[i]}
-                onClick={() => this.handleClick(i)}
-            />
-        )
+            /**<Square
+                    value={this.state.squares[i]}
+                    onClick={() => this.handleClick(i)}
+               />*/
+        <Square
+            value={this.props.squares[i]}
+            onClick={() => this.props.onClick(i)}
+        />
+    )
     }
 
     render() {
-        const winner = calculateWinner(this.state.squares);
-        let status;
-        if (winner) {
-            status = 'Winner: ' + winner;
-        } else {
-            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-        }
+        /***Since the Game component is now rendering the game’s status, we can remove the corresponding code
+         *  from the Board’s render method. After refactoring, the Board’s render function looks like this:*/
+        // const winner = calculateWinner(this.state.squares);
+        // let status;
+        // if (winner) {
+        //     status = 'Winner: ' + winner;
+        // } else {
+        //     status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+        // }
 
         /**In the beginning, we passed the value prop down from the Board to show numbers from 0 to 8 in every Square.
          *  In a different previous step, we replaced the numbers with an “X” mark determined by Square’s own state.
          *  This is why Square currently ignores the value prop passed to it by the Board.*/
         return (
             <div>
-                <div className="status">{status}</div>
+                {/*<div className="status">{status}</div>*/}
                 <div className="board-row">
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
@@ -128,15 +137,77 @@ class Board extends React.Component {
 
 //Game component renders a board with placeholder values which we’ll modify later
 class Game extends React.Component {
+    /**We’ll want the top-level Game component to display a list of past moves.
+     *  It will need access to the history to do that, so we will place the history state in the top-level Game component.*/
+    constructor(props) {
+        super(props);
+        this.state = {
+            history: [{
+                squares: Array(9).fill(null),
+            }],
+            xIsNext: true,
+            stepNumber: 0
+        };
+    }
+
+    jumpTo(step) {
+        this.setState({
+            stepNumber: step,
+            xIsNext: (step % 2) === 0,
+        });
+    }
+
+    handleClick(i) {
+        /**This ensures that if we “go back in time” and then make a new move from that point, we throw away all the “future” history that would now become incorrect.*/
+        const history = this.state.history.slice(0, this.state.stepNumber + 1);
+        const current = history[this.state.stepNumber];
+        const squares = current.squares.slice();
+        if (calculateWinner(squares) || squares[i]) {
+            return;
+        }
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        this.setState({
+            /**Unlike the array push() method you might be more familiar with, the concat() method doesn’t mutate the original array, so we prefer it.*/
+            history: history.concat([{squares: squares,}]),
+            xIsNext: !this.state.xIsNext,
+            stepNumber: history.length
+        });
+    }
+
     render() {
+        /**We’ll update the Game component’s render function to use the most recent history entry to determine and display the game’s status:*/
+        const history = this.state.history;
+        const current = history[history.length - 1];
+        const winner = calculateWinner(current.squares);
+        /**Let’s map over the history in the Game’s render method:*/
+        const moves = history.map((step, move) => {
+            const desc = move ?
+                'Go to move #' + move :
+                'Go to game start';
+            return (
+                <li key={move}>
+                    <button onClick={() => this.jumpTo(move)}>{desc}</button>
+                </li>
+            );
+        });
+        let status;
+        if (winner) {
+            status = 'Winner: ' + winner;
+        } else {
+            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+        }
         return (
             <div className="game">
                 <div className="game-board">
-                    <Board/>
+                    <Board
+                        squares={current.squares}
+                        onClick={(i) => this.handleClick(i)}
+                    />
+
                 </div>
                 <div className="game-info">
-                    <div>{/* status */}</div>
-                    <ol>{/* TODO */}</ol>
+                    <div>{status}</div>
+                    <ol>{moves}</ol>
                 </div>
             </div>
         );
